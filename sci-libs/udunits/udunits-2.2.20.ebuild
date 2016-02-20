@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit fortran-2
+#inherit fortran-2
 
 DESCRIPTION="Library for manipulating units of physical quantities"
 HOMEPAGE="https://www.unidata.ucar.edu/software/udunits/"

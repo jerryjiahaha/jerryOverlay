@@ -11,13 +11,13 @@ inherit cmake-utils eutils python-r1 wxwidgets toolchain-funcs virtualx
 
 DESCRIPTION="GNU Data Language"
 HOMEPAGE="http://gnudatalanguage.sourceforge.net/"
-SRC_URI="mirror://sourceforge/gnudatalanguage/${P}.tar.gz"
+SRC_URI="mirror://sourceforge/gnudatalanguage/${P}v2.tgz"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86 ~amd64-linux ~x86-linux"
 IUSE="+eigen fftw grib gshhs hdf hdf5 imagemagick netcdf openmp
-png proj postscript python static-libs udunits wxwidgets"
+png proj postscript python static-libs udunits qhull wxwidgets"
 
 RDEPEND="
 	dev-cpp/antlr-cpp:2=
@@ -46,6 +46,7 @@ RDEPEND="
 		dev-python/numpy[${PYTHON_USEDEP}]
 	)
 	udunits? ( sci-libs/udunits )
+	qhull? ( media-libs/qhull )
 	wxwidgets? ( x11-libs/wxGTK:${WX_GTK_VER}[X] )"
 
 DEPEND="${RDEPEND}
@@ -56,10 +57,10 @@ DEPEND="${RDEPEND}
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 PATCHES=(
-	"${FILESDIR}"/0.9.5-antlr.patch
-	"${FILESDIR}"/0.9.2-include.patch
-	"${FILESDIR}"/0.9.5-plplot.patch
-	"${FILESDIR}"/0.9.5-png.patch
+	"${FILESDIR}"/0.9.6-antlr.patch
+#	"${FILESDIR}"/0.9.2-include.patch
+#	"${FILESDIR}"/0.9.5-plplot.patch
+#	"${FILESDIR}"/0.9.5-png.patch
 )
 
 pkg_setup() {
@@ -113,6 +114,7 @@ src_configure() {
 		$(cmake-utils_use proj LIBPROJ4)
 		$(cmake-utils_use postscript PSLIB)
 		$(cmake-utils_use udunits)
+		$(cmake-utils_use qhull)
 		$(cmake-utils_use wxwidgets)
 	)
 	if use imagemagick; then
