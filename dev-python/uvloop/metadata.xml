@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>jerryjiahaha@gmail.com</email>
+		<name>Jerry Jia</name>
+	</maintainer>
+	<longdescription>uvloop is a fast, drop-in replacement of the built-in asyncio event loop. uvloop is implemented in Cython and uses libuv under the hood.</longdescription>
+	<upstream>
+      <remote-id type="pypi">uvloop</remote-id>
+      <remote-id type="github">MagicStack/uvloop</remote-id>
+    </upstream>
+</pkgmetadata>
