@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="project">
+		<email>jerryjiahaha@gmail.com</email>
+		<name>Jerry Jia</name>
+	</maintainer>
+	<longdescription lang="en">
+		YouCompleteMe is a fast, as-you-type, fuzzy-search code completion engine for Vim.
+</longdescription>
+	<use>
+		<flag name="csharp">Add completion support for C#</flag>
+		<flag name="go">Add completion support for go</flag>
+		<flag name="javascript">Add completion support for javascript</flag>
+		<flag name="clang">C-family Semantic Completion Engine</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">Valloric/YouCompleteMe</remote-id>
+	</upstream>
+</pkgmetadata>

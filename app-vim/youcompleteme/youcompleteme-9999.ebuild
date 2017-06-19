@@ -4,7 +4,7 @@
 
 EAPI=5
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_4 )
 
 inherit eutils multilib python-single-r1 cmake-utils vim-plugin flag-o-matic
 
@@ -20,12 +20,12 @@ DESCRIPTION="vim plugin: a code-completion engine for Vim"
 HOMEPAGE="http://valloric.github.io/YouCompleteMe/"
 
 LICENSE="GPL-3"
-IUSE="+clang go javascript test"
+IUSE="+clang go javascript csharp rust typescript test"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 COMMON_DEPEND="
 	${PYTHON_DEPS}
-	clang? ( >=sys-devel/clang-3.3 )
+	clang? ( >=sys-devel/clang-3.8 )
 	dev-libs/boost[python,threads,${PYTHON_USEDEP}]
 	|| (
 		app-editors/vim[python,${PYTHON_USEDEP}]
@@ -45,8 +45,17 @@ DEPEND="
 	go? (
 		dev-lang/go
 	)
+	csharp? (
+		dev-lang/mono
+	)
 	javascript? (
 		net-libs/nodejs[npm]
+	)
+	typescript? (
+		net-libs/nodejs[npm]
+	)
+	rust? (
+		dev-lang/rust
 	)
 	test? (
 		>=dev-python/mock-1.0.1[${PYTHON_USEDEP}]
@@ -78,11 +87,12 @@ src_configure() {
 	local mycmakeargs=(
 		$(cmake-utils_use_use clang CLANG_COMPLETER)
 		$(cmake-utils_use_use clang SYSTEM_LIBCLANG)
+		-DUSE_PYTHON2=OFF
 		-DUSE_SYSTEM_BOOST=ON
 		-DUSE_SYSTEM_GMOCK=ON
 	)
 	## TODO use clang
-	## use clang && mycmakeargs+=( -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang ) 
+	## use clang && mycmakeargs+=( -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang )
 
 	replace-flags -O2 -O3
 	## TODO test CC support c++11
@@ -92,7 +102,7 @@ src_configure() {
 
 src_compile() {
 
-	cmake-utils_src_compile ycm_support_libs
+	cmake-utils_src_compile
 
 	if use "javascript" ; then
 		cd "${S}"/third_party/ycmd/third_party/tern_runtime || die
@@ -109,8 +119,21 @@ src_compile() {
 		rm -rf "${S}"/third_party/ycmd/third_party/godef || die
 	fi
 
-	## TODO add typescript use && support
-	## TODO add rust support && support
+	if use "csharp" ; then
+		cd "${S}"/third_party/ycmd/third_party/OmniSharpServer && xbuild /property:Configuration=Release || die
+	else
+		rm -rf "${S}"/third_party/ycmd/third_party/OmniSharpServer || die
+	fi
+
+	if use "typescript"; then
+		npm install -g typescript
+	fi
+
+	if use "rust"; then
+		cd "${S}"/third_party/ycmd/third_party/racerd && cargo build --release || die
+	else
+		rm -rf "${S}"/third_party/ycmd/third_party/racerd || die
+	fi
 }
 
 src_test() {
@@ -130,17 +153,35 @@ src_install() {
 
 	rm -rf third_party/ycmd/ci
 
-	dodoc *.md third_party/ycmd/*.md || true
+	#dodoc *.md third_party/ycmd/*.md || true
 	rm -r *.md *.sh COPYING.txt third_party/ycmd/cpp || die
 	rm -r third_party/ycmd/{*.md,*.sh} || die
 
 	! use test && find python -name *test* -exec rm -rf {} + || die
 	! use test && rm -rf third_party/ycmd/clang_includes
-	egit_clean
 	rm third_party/ycmd/libclang.so* || die
 
-	find ./ -name *.pyc -exec rm -rf {} + || die
-	find ./ -name *.pyo -exec rm -rf {} + || die
+	rm -rf travis || die
+	find ./ -name .gitignore -exec rm -r {} + || die
+
+	if use "go" ; then
+		find third_party/ycmd/third_party/gocode ! -name "gocode" -exec rm -r {} + || true
+		find third_party/ycmd/third_party/godef ! -name "godef" -exec rm -r {} + || true
+	fi
+
+	if use "csharp" ; then
+		mkdir ._cs
+		mv third_party/ycmd/third_party/OmniSharpServer/OminiSharp/bin/Release ._cs/
+		rm -rf third_party/ycmd/third_party/OmniSharpServer
+		mkdir -p third_party/ycmd/third_party/OmniSharpServer/OminiSharp/bin/
+		mv ._cs/Release third_party/ycmd/third_party/OmniSharpServer/OminiSharp/bin/
+		rmdir ._cs
+#		find  third_party/ycmd/third_party/OmniSharpServer -maxdepth 1 -type d -not -name "OmniSharp" -exec rm -r {} + || true
+#		find  third_party/ycmd/third_party/OmniSharpServer -maxdepth 1 -type d -not -name "OmniSharp" -exec rm -r {} + || true
+	fi
+
+	egit_clean
+
 
 	vim-plugin_src_install
 
@@ -151,5 +192,5 @@ src_install() {
 pkg_postinst() {
 	vim-plugin_pkg_postinst
 
-	optfeature "install typescript with npm for Typescript autocompletion"
+	#optfeature "install typescript with npm for Typescript autocompletion"
 }

@@ -23,7 +23,7 @@ dev-python/PyQt5[webkit]
 dev-python/requests
 dev-python/pillow
 dev-python/python3-xlib
-app-text/tesseract[linguas_zh_CN,linguas_zh_TW]
+app-text/tesseract[l10n_zh-CN,l10n_zh-TW]
 "
 
 DEPEND="${RDEPEND}"
